@@ -18,8 +18,8 @@ struct stud {
 
 //functions
 void ADD(stud** list, stud* &newStud, int size);
-void PRINT(stud** list);
-void REMOVE(stud** list);
+void PRINT(stud** list, int size);
+void REMOVE(stud** list, int id, int size);
 bool checkCollision(stud** list, int size);
 
 int main() {
@@ -62,7 +62,7 @@ int main() {
       cout << endl << "New student added to hash table." << endl;
       //balance if collision
       if (checkCollision(list, size)) {
-	cout << "balance" << endl;
+	cout << endl << "Rebalancd hash table array to double the size." << endl;
 	stud** temp = new stud*[size];  //create temp array
 	for (int m = 0; m < size; m++) {
 	  temp[m] = list[m];
@@ -72,22 +72,39 @@ int main() {
 	for (int c = 0; c < newsize; c++) {
           list[c] = NULL;
         }
-	//add all students to newly sized list
+	//re-add all students to newly sized list
 	for (int a = 0; a < size; a++) {
-	  stud* move = temp[a];
-	  cout << " c1" << endl;
-	  ADD(list, move, newsize);
-	  cout << " c2" << endl;
-	  cout << a << endl;
+	  if (temp[a] != NULL) {
+	    stud* move = temp[a];
+	    if (move->next != NULL) {
+	      stud* nxt = move->next;
+	      move->next = NULL;
+	      nxt->prev = NULL;
+	      ADD(list, nxt, newsize);
+	      if (nxt->next != NULL) {
+		stud* dnxt = nxt->next;
+		nxt->next = NULL;
+		dnxt->prev = NULL;
+		ADD(list, dnxt, newsize);
+	      }
+	    }
+	    ADD(list, move, newsize);
+	  }
 	}
+	delete[] temp;
 	size = newsize; //update list's size
       }
     }
     else if (strcmp(input, "remove") == 0) {
-      
+      cout << "Input ID of student to remove: ";
+      int in;
+      cin >> in;
+      cin.clear();
+      cin.ignore(10000, '\n');
+      REMOVE(list, in, size);
     }
     else if (strcmp(input, "print") == 0) {
-
+      PRINT(list, size);
     }
     else if (strcmp(input, "quit") == 0) {
       cout << endl << "Thank you for using this program." << endl;
@@ -134,4 +151,46 @@ bool checkCollision(stud** list, int size) {
     ctr++;
   }
   return newlist;
+}
+
+void PRINT(stud** list, int size) {
+  for (int i = 0; i < size; i++) {
+    if (list[i] != NULL) {
+      cout << list[i]->Fname << " " << list[i]->Lname << "," << list[i]->id;
+      if (list[i]->next != NULL) {
+	cout << '\t' << list[i]->next->Fname << " " << list[i]->next->Lname << "," << list[i]->next->id;
+      }
+      cout << endl;
+    }
+  }
+}
+
+void REMOVE(stud** list, int id, int size) {
+  int i = id % size;
+  if (list[i] == NULL) {
+    cout << endl << "No such student to remove." << endl;
+  } else {
+    if (list[i]->id == id) {
+      //found then delete
+      if (list[i]->next == NULL) {
+	list[i] = NULL; 
+      } else {
+	//replace with next in collision
+	stud* newcurr = list[i]->next;
+	newcurr->prev = NULL;
+	list[i] = newcurr;
+      }
+    } else {
+      if (list[i]->next == NULL) {
+	cout << endl << "No such student to remove." << endl;
+      } else {
+	if (list[i]->next->id == id) {
+	  //found then remove
+	  list[i]->next = NULL;
+	} else {
+	    cout << "No such student to remove." << endl;
+	}
+      }
+    }
+  }
 }
