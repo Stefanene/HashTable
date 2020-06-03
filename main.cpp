@@ -1,9 +1,14 @@
 /*This program is a Hash Table based on my previous Student List
     By Stefan Ene
+      Works Cited: random file input done with help from COdeSpeedy
 */
 
 #include <iostream>
 #include <cstring>
+#include <fstream>
+#include <time.h>
+#include <vector> //for random input, dont worry
+#include <time.h>
 
 using namespace std;
 
@@ -21,6 +26,7 @@ void ADD(stud** list, stud* &newStud, int size);
 void PRINT(stud** list, int size);
 void REMOVE(stud** list, int id, int size);
 bool checkCollision(stud** list, int size);
+void ADDRANDOM(stud** list, int size);
 
 int main() {
   //variables
@@ -30,10 +36,10 @@ int main() {
   stud** list = new stud*[100];
   int size = 100;
   //program
-  cout << "=====================" << endl;
+  cout << "==========================" << endl;
   cout << "This is a Hash Table for Student List." << endl;
   while (run) {
-    cout << endl << "You can: add, remove, print, quit." << endl;
+    cout << endl << "You can: add, addrand, remove, print, quit." << endl;
     cin.get(input, 10);
     cin.clear();
     cin.ignore(10000, '\n');
@@ -106,6 +112,9 @@ int main() {
     else if (strcmp(input, "print") == 0) {
       PRINT(list, size);
     }
+    else if (strcmp(input, "addrand") == 0) {
+      ADDRANDOM(list, size);
+    }
     else if (strcmp(input, "quit") == 0) {
       cout << endl << "Thank you for using this program." << endl;
       cout << "========================" << endl << endl;
@@ -117,6 +126,7 @@ int main() {
   return 0;
 }
 
+//basically the hash function, takes id and gets mod to list' size
 void ADD(stud** list, stud* &newStud, int size) {
   int index = (newStud->id) % size;
   //put new student in current array
@@ -135,6 +145,51 @@ void ADD(stud** list, stud* &newStud, int size) {
       (((list[index])->next)->next)->prev = ((list[index])->next)->next;
     }
   }
+}
+
+void ADDRANDOM(stud** list, int size) {
+  int in;
+  cout << "How many random students should be added: ";
+  cin >> in;
+  cin.clear();
+  cin.ignore(10000, '\n');
+  int temp = in;
+  //done with help from CodeSpeedy
+  string line_f;
+  string line_l;
+  char arr_f[30];
+  char arr_l[30];
+  vector<string> lines_f;
+  vector<string> lines_l;
+  srand(time(0));
+  //get random line from file for first & last name
+  ifstream file_f("fnames.txt");
+  ifstream file_l("lnames.txt");
+  //count number of total lines in the file and store the lines in the string vector
+  int total_lines_f = 0;
+  int total_lines_l = 0;
+  while (getline(file_f,line_f)) {
+    total_lines_f++; 
+    lines_f.push_back(line_f);	
+  }
+  while (getline(file_l,line_l)) {
+    total_lines_l++;
+    lines_l.push_back(line_l);
+  }
+  //generate a random number between 0 and count of total lines
+  int random_f[in];
+  int random_l[in];
+  while (in > 0) {
+    in--;
+    random_f[in] = rand() % total_lines_f;
+    cout << random_f[in] << endl;
+    random_l[in] = rand() % total_lines_l;
+    cout << " " << random_l[in] << endl;
+  }
+  for (int i = 0; i < temp; i++) {
+    cout << lines_f[random_f[i]] << " " << lines_l[random_l[i]] << endl;
+  }
+  cout << endl << "Added " << temp << " students." << endl;
 }
 
 bool checkCollision(stud** list, int size) {
