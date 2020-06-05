@@ -26,12 +26,13 @@ void ADD(stud** list, stud* &newStud, int size);
 void PRINT(stud** list, int size);
 void REMOVE(stud** list, int id, int size);
 bool checkCollision(stud** list, int size);
-void ADDRANDOM(stud** list, int size);
+void ADDRANDOM(stud** list, int size, int &randid);
 
 int main() {
   //variables
   bool run = true;
   char input[10];
+  int randid = 6; //keeps track or random id value
   //hash table variabes
   stud** list = new stud*[100];
   int size = 100;
@@ -113,7 +114,7 @@ int main() {
       PRINT(list, size);
     }
     else if (strcmp(input, "addrand") == 0) {
-      ADDRANDOM(list, size);
+      ADDRANDOM(list, size, randid);
     }
     else if (strcmp(input, "quit") == 0) {
       cout << endl << "Thank you for using this program." << endl;
@@ -147,47 +148,57 @@ void ADD(stud** list, stud* &newStud, int size) {
   }
 }
 
-void ADDRANDOM(stud** list, int size) {
+void ADDRANDOM(stud** list, int size, int &randid) {
   int in;
+  srand(time(NULL));
   cout << "How many random students should be added: ";
   cin >> in;
   cin.clear();
   cin.ignore(10000, '\n');
   int temp = in;
-  //done with help from CodeSpeedy
-  string line_f;
-  string line_l;
-  char arr_f[30];
-  char arr_l[30];
-  vector<string> lines_f;
-  vector<string> lines_l;
-  srand(time(0));
-  //get random line from file for first & last name
-  ifstream file_f("fnames.txt");
-  ifstream file_l("lnames.txt");
-  //count number of total lines in the file and store the lines in the string vector
-  int total_lines_f = 0;
-  int total_lines_l = 0;
-  while (getline(file_f,line_f)) {
-    total_lines_f++; 
-    lines_f.push_back(line_f);	
-  }
-  while (getline(file_l,line_l)) {
-    total_lines_l++;
-    lines_l.push_back(line_l);
-  }
-  //generate a random number between 0 and count of total lines
-  int random_f[in];
-  int random_l[in];
   while (in > 0) {
+    string line;
+    string keepf;
+    int ctr = 0;
+    int random = rand() % 20;
+    ifstream myfile("fnames.txt");
+    if (myfile.is_open()) {
+      while ( myfile.good()) {
+	getline (myfile,line);
+	if (ctr == random) {
+	  keepf = line;
+	  //cout << random << keepf << endl;
+	}
+	ctr++;
+      }
+      myfile.close();
+    } else cout << "Counld not locate file." << endl;
+    string lin;
+    string keepl;
+    ctr = 0;
+    random = rand() % 20;
+    ifstream myfile1("lnames.txt");
+    if (myfile1.is_open()) {
+      while (myfile1.good()) {
+	getline (myfile1, lin);
+	if (ctr == random) {
+	  keepl = lin;
+	  //cout << " " << random << keepl << endl;
+	}
+	ctr++;
+      }
+    } else cout << "Could not locate file." << endl;
+    //make student
+    stud* newStud = new stud();
+    strcpy(newStud->Fname, keepf.c_str());
+    strcpy(newStud->Lname, keepl.c_str());
+    newStud->id = randid;
+    newStud->gpa = static_cast <float> (rand()) / (static_cast <float> (RAND_MAX/5));
+    //add new student to list
+    ADD(list, newStud, size);
+    
+    randid = randid + 100; //increment id coutnter by 100
     in--;
-    random_f[in] = rand() % total_lines_f;
-    cout << random_f[in] << endl;
-    random_l[in] = rand() % total_lines_l;
-    cout << " " << random_l[in] << endl;
-  }
-  for (int i = 0; i < temp; i++) {
-    cout << lines_f[random_f[i]] << " " << lines_l[random_l[i]] << endl;
   }
   cout << endl << "Added " << temp << " students." << endl;
 }
