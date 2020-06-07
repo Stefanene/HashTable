@@ -223,14 +223,15 @@ bool checkCollision(stud** list, int size) {
 void PRINT(stud** list, int size) {
   for (int i = 0; i < size; i++) {
     if (list[i] != NULL) {
-      cout << list[i]->Fname << " " << list[i]->Lname << " #";
-      cout << list[i]->id << ", GPA:" << fixed << setprecision(2) << list[i]->next->gpa;
+      cout << list[i]->Fname << " " << list[i]->Lname << " #" << list[i]->id << ", GPA:";
+      cout << fixed << setprecision(2) << list[i]->gpa;
       if (list[i]->next != NULL) {
 	cout << '\t' << list[i]->next->Fname << " " << list[i]->next->Lname << " #";
-	cout << list[i]->next->id << ", GPA:" << fixed << setprecision(2) << list[i]->next->gpa;
+	cout << list[i]->next->id << ", GPA: ";
+	cout << fixed << setprecision(2) << list[i]->next->gpa;
       }
       cout << endl;
-    }
+    } 
   }
 }
 
