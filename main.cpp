@@ -1,6 +1,6 @@
 /*This program is a Hash Table based on my previous Student List
     By Stefan Ene
-      Works Cited: random file input done with help from COdeSpeedy
+      Works Cited: random file input done with help from CodeSpeedy
 */
 
 #include <iostream>
@@ -27,7 +27,7 @@ void ADD(stud** list, stud* &newStud, int size);
 void PRINT(stud** list, int size);
 void REMOVE(stud** list, int id, int size);
 bool checkCollision(stud** list, int size);
-void ADDRANDOM(stud** list, int size, int &randid);
+stud* ADDRANDOM(stud** list, int size, int &randid);
 
 int main() {
   //variables
@@ -45,7 +45,7 @@ int main() {
     cin.get(input, 10);
     cin.clear();
     cin.ignore(10000, '\n');
-    if (strcmp(input, "add") == 0) {
+    if (strcmp(input, "add") == 0) {  //add student manually
       //get info from user input
       stud* newStud = new stud();
       newStud->next = NULL;
@@ -103,7 +103,7 @@ int main() {
 	size = newsize; //update list's size
       }
     }
-    else if (strcmp(input, "remove") == 0) {
+    else if (strcmp(input, "remove") == 0) {  //remove student
       cout << "Input ID of student to remove: ";
       int in;
       cin >> in;
@@ -111,15 +111,51 @@ int main() {
       cin.ignore(10000, '\n');
       REMOVE(list, in, size);
     }
-    else if (strcmp(input, "print") == 0) {
+    else if (strcmp(input, "print") == 0) {  //print list with students
       PRINT(list, size);
     }
-    else if (strcmp(input, "addrand") == 0) {
-      ADDRANDOM(list, size, randid);
+    else if (strcmp(input, "addrand") == 0) {  //add random student
+      stud* add = ADDRANDOM(list, size, randid);
+      randid = randid + 100;
+      ADD(list, add, size);
+      //balance if collision
+      if (checkCollision(list, size)) {
+        cout << endl << "Rebalancd hash table array to double the size." << endl;
+        stud** temp = new stud*[size];  //create temp array
+        for (int m = 0; m < size; m++) {
+          temp[m] = list[m];
+        }
+        int newsize = 2*size;
+        list = new stud*[newsize]; //recreate list to double
+        for (int c = 0; c < newsize; c++) {
+          list[c] = NULL;
+        }
+        //re-add all students to newly sized list
+        for (int a = 0; a < size; a++) {
+          if (temp[a] != NULL) {
+            stud* move = temp[a];
+            if (move->next != NULL) {
+              stud* nxt = move->next;
+              move->next = NULL;
+              nxt->prev = NULL;
+              ADD(list, nxt, newsize);
+              if (nxt->next != NULL) {
+                stud* dnxt = nxt->next;
+                nxt->next = NULL;
+                dnxt->prev = NULL;
+                ADD(list, dnxt, newsize);
+              }
+            }
+            ADD(list, move, newsize);
+          }
+        }
+        delete[] temp;
+        size = newsize; //update list's size
+      }
     }
     else if (strcmp(input, "quit") == 0) {
       cout << endl << "Thank you for using this program." << endl;
-      cout << "========================" << endl << endl;
+      cout << "========================" << endl;
       run = false;
     } else {
       cout << endl << "Invalid input. Try again." << endl;
@@ -149,59 +185,31 @@ void ADD(stud** list, stud* &newStud, int size) {
   }
 }
 
-void ADDRANDOM(stud** list, int size, int &randid) {
-  int in;
-  srand(time(NULL));
-  cout << "How many random students should be added: ";
-  cin >> in;
-  cin.clear();
-  cin.ignore(10000, '\n');
-  int temp = in;
-  while (in > 0) {
-    string line;
-    string keepf;
-    int ctr = 0;
-    int random = rand() % 20;
-    ifstream myfile("fnames.txt");
-    if (myfile.is_open()) {
-      while ( myfile.good()) {
-	getline (myfile,line);
-	if (ctr == random) {
-	  keepf = line;
-	  //cout << random << keepf << endl;
-	}
-	ctr++;
-      }
-      myfile.close();
-    } else cout << "Counld not locate file." << endl;
-    string lin;
-    string keepl;
-    ctr = 0;
-    random = rand() % 20;
-    ifstream myfile1("lnames.txt");
-    if (myfile1.is_open()) {
-      while (myfile1.good()) {
-	getline (myfile1, lin);
-	if (ctr == random) {
-	  keepl = lin;
-	  //cout << " " << random << keepl << endl;
-	}
-	ctr++;
-      }
-    } else cout << "Could not locate file." << endl;
-    //make student
-    stud* newStud = new stud();
-    strcpy(newStud->Fname, keepf.c_str());
-    strcpy(newStud->Lname, keepl.c_str());
-    newStud->id = randid;
-    newStud->gpa = static_cast <float> (rand()) / (static_cast <float> (RAND_MAX/5));
-    //add new student to list
-    ADD(list, newStud, size);
-    
-    randid = randid + 100; //increment id coutnter by 100
-    in--;
+stud* ADDRANDOM(stud** list, int size, int &randid) {
+  string line;
+  vector<string> keepf;
+  int randomf = rand() % 20;
+  ifstream myfile("fnames.txt");
+  while (getline(myfile,line)) {
+    keepf.push_back(line);
   }
-  cout << endl << "Added " << temp << " students." << endl;
+  string lin;
+  vector<string> keepl;
+  int randoml = rand() % 20;
+  ifstream myfile1("lnames.txt");
+  while (getline(myfile1, lin)) {
+    keepl.push_back(lin);
+  }
+  //make student
+  stud* newStud = new stud();
+  cout << keepf[randomf];
+  cout << " " << keepl[randoml] << endl;
+  strcpy(newStud->Fname, (keepf[randomf]).c_str());
+  strcpy(newStud->Lname, (keepl[randoml]).c_str());
+  newStud->id = randid;
+  newStud->gpa = static_cast <float> (rand()) / (static_cast <float> (RAND_MAX/5));
+  //return new student
+  return newStud;
 }
 
 bool checkCollision(stud** list, int size) {
