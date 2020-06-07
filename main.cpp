@@ -6,6 +6,7 @@
 #include <iostream>
 #include <cstring>
 #include <fstream>
+#include <iomanip>
 #include <time.h>
 #include <vector> //for random input, dont worry
 #include <time.h>
@@ -222,9 +223,11 @@ bool checkCollision(stud** list, int size) {
 void PRINT(stud** list, int size) {
   for (int i = 0; i < size; i++) {
     if (list[i] != NULL) {
-      cout << list[i]->Fname << " " << list[i]->Lname << "," << list[i]->id;
+      cout << list[i]->Fname << " " << list[i]->Lname << " #";
+      cout << list[i]->id << ", GPA:" << fixed << setprecision(2) << list[i]->next->gpa;
       if (list[i]->next != NULL) {
-	cout << '\t' << list[i]->next->Fname << " " << list[i]->next->Lname << "," << list[i]->next->id;
+	cout << '\t' << list[i]->next->Fname << " " << list[i]->next->Lname << " #";
+	cout << list[i]->next->id << ", GPA:" << fixed << setprecision(2) << list[i]->next->gpa;
       }
       cout << endl;
     }
