@@ -115,72 +115,80 @@ int main() {
       PRINT(list, size);
     }
     else if (strcmp(input, "addrand") == 0) {  //add random student
-      stud* newStud = new stud(); //initialize new student
-      srand(time(0));
-      string line;
-      string keepf;
-      int randomf = rand() % 20;
-      ifstream myfile("fnames.txt");
-      int linenr;
-      while (getline(myfile,line)) {
-	linenr++;
-	if (linenr == randomf) {
-	  //cout << line << endl;
-	  strcpy(newStud->Fname, line.c_str());
-	  cout << newStud->Fname << endl;
+      int num;
+      cout << endl << "How many random students should be added: ";
+      cin >> num;
+      cin.clear();
+      cin.ignore(10000, '\n');
+      while (num > 0) {
+	stud* newStud = new stud(); //initialize new student
+	srand(time(0));
+	string line;
+	string keepf;
+	int randomf = rand() % 20;
+	ifstream myfile("fnames.txt");
+	int linenr;
+	while (getline(myfile,line)) {
+	  linenr++;
+	  if (linenr == randomf) {
+	    //cout << line << endl;
+	    strcpy(newStud->Fname, line.c_str());
+	    cout << newStud->Fname << endl;
+	  }
 	}
-      }
-      string lin;
-      string keepl;
-      int randoml = rand() % 20;
-      ifstream myfile1("lnames.txt");
-      linenr = 0; //restar count
-      while (getline(myfile1, lin)) {
-	linenr++;
-	if (linenr == randoml) {
-	  //cout << lin << endl;
-	  strcpy(newStud->Lname, lin.c_str());
-	  cout << newStud->Lname << endl;
+	string lin;
+	string keepl;
+	int randoml = rand() % 20;
+	ifstream myfile1("lnames.txt");
+	linenr = 0; //restar count
+	while (getline(myfile1, lin)) {
+	  linenr++;
+	  if (linenr == randoml) {
+	    //cout << lin << endl;
+	    strcpy(newStud->Lname, lin.c_str());
+	    cout << newStud->Lname << endl;
+	  }
 	}
-      }
-      newStud->id = randid;
-      newStud->gpa = static_cast <float> (rand()) / (static_cast <float> (RAND_MAX/5));
-      randid = randid + 100;
-      //add new student genrated
-      ADD(list, newStud, size);
-      //balance if collision
-      if (checkCollision(list, size)) {
-        cout << endl << ">>Rebalancing hash table array to double the size." << endl;
-        stud** temp = new stud*[size];  //create temp array
-        for (int m = 0; m < size; m++) {
-          temp[m] = list[m];
-        }
-        int newsize = 2*size;
-        list = new stud*[newsize]; //recreate list to double
-        for (int c = 0; c < newsize; c++) {
-          list[c] = NULL;
-        }
-        //re-add all students to newly sized list
-        for (int a = 0; a < size; a++) {
-          if (temp[a] != NULL) {
-            stud* move = temp[a];
-            if (move->next != NULL) {
-              stud* nxt = move->next;
-              move->next = NULL;
-              nxt->prev = NULL;
-              ADD(list, nxt, newsize);
-              if (nxt->next != NULL) {
-                stud* dnxt = nxt->next;
-                nxt->next = NULL;
-                dnxt->prev = NULL;
-                ADD(list, dnxt, newsize);
-              }
-            }
+	newStud->id = randid;
+	newStud->gpa = static_cast <float> (rand()) / (static_cast <float> (RAND_MAX/5));
+	randid = randid + 100;
+	//add new student genrated
+	ADD(list, newStud, size);
+	//balance if collision
+	if (checkCollision(list, size)) {
+	  cout << endl << ">>Rebalancing hash table array to double the size." << endl;
+	  stud** temp = new stud*[size];  //create temp array
+	  for (int m = 0; m < size; m++) {
+	    temp[m] = list[m];
+	  }
+	  int newsize = 2*size;
+	  list = new stud*[newsize]; //recreate list to double
+	  for (int c = 0; c < newsize; c++) {
+	    list[c] = NULL;
+	  }
+	  //re-add all students to newly sized list
+	  for (int a = 0; a < size; a++) {
+	    if (temp[a] != NULL) {
+	      stud* move = temp[a];
+	      if (move->next != NULL) {
+		stud* nxt = move->next;
+		move->next = NULL;
+		nxt->prev = NULL;
+		ADD(list, nxt, newsize);
+		if (nxt->next != NULL) {
+		  stud* dnxt = nxt->next;
+		  nxt->next = NULL;
+		  dnxt->prev = NULL;
+		  ADD(list, dnxt, newsize);
+		}
+	      }
             ADD(list, move, newsize);
-          }
-        }
-        delete[] temp;
-        size = newsize; //update list's size
+	    }
+	  }
+	  delete[] temp;
+	  size = newsize; //update list's size
+	}
+	num--;
       }
     }
     else if (strcmp(input, "quit") == 0) {
@@ -274,13 +282,13 @@ void PRINT(stud** list, int size) {
     if (curr != NULL) {
       cout << curr->Fname << " ";
       cout << curr->Lname;
-      cout << " #" << curr->id << " GPA";
+      cout << " #" << curr->id << " GPA:";
       cout << fixed << setprecision(2) << curr->gpa;
       stud* nxt = curr->next;
       if (nxt != NULL) {
 	cout << '\t' << nxt->Fname << " ";
 	cout << nxt->Lname;
-	cout << "#" << nxt->id << " GPA";
+	cout << "#" << nxt->id << " GPA:";
 	cout << fixed << setprecision(2) << nxt->gpa;
       }
       cout << endl;
