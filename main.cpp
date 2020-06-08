@@ -22,7 +22,7 @@ struct stud {
 };
 
 //functions
-void ADD(stud** list, stud* &newStud, int size);
+void ADD(stud** list, stud* newStud, int size);
 void PRINT(stud** list, int size);
 void REMOVE(stud** list, int id, int size);
 bool checkCollision(stud** list, int size);
@@ -131,6 +131,7 @@ int main() {
       char first[81];
       while (linenr < 20) {
 	myfile.getline(first, 81);
+	cout << first << linenr << endl;
 	strcpy(namef[linenr], first);
 	linenr++;
       }
@@ -150,7 +151,6 @@ int main() {
 	//assign random data to new studen
 	strcpy(newStud->Fname, namef[randomf]);
 	strcpy(newStud->Lname, namel[randoml]);
-	cout << " " << newStud->Fname << " " << newStud->Lname << endl;
 	newStud->id = randid;
 	newStud->gpa = (float)rand()/(RAND_MAX)*5;
 	randid = randid + 100;
@@ -205,7 +205,7 @@ int main() {
 }
 
 //basically the hash function, takes id and gets mod to list' size
-void ADD(stud** list, stud* &newStud, int size) {
+void ADD(stud** list, stud* newStud, int size) {
   int index = (newStud->id) % size;
   //put new student in current array
   if (list[index] == NULL) {
