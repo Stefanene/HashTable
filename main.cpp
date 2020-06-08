@@ -8,8 +8,7 @@
 #include <fstream>
 #include <iomanip>
 #include <time.h>
-#include <vector> //for random input, dont worry
-#include <time.h>
+
 
 using namespace std;
 
@@ -116,41 +115,44 @@ int main() {
     }
     else if (strcmp(input, "addrand") == 0) {  //add random student
       int num;
+      //initialize name arrays
+      char** namef = new char*[20];
+      char** namel = new char*[20];
+      for (int i = 0; i < 20; i++) {
+	namef[i] = new char[81];
+	namel[i] = new char[81];
+      }
       cout << endl << "How many random students should be added: ";
       cin >> num;
       cin.clear();
       cin.ignore(10000, '\n');
+      ifstream myfile("fnames.txt");
+      int linenr = 0;
+      char first[81];
+      while (linenr < 20) {
+	myfile.getline(first, 81);
+	strcpy(namef[linenr], first);
+	linenr++;
+      }
+      ifstream myfile1("lnames.txt");
+      char last[81];
+      linenr = 0; //restar count
+      while (linenr < 20) {
+	myfile1.getline(last, 81);
+	strcpy(namel[linenr], last);
+	linenr++;
+      }
       while (num > 0) {
-	stud* newStud = new stud(); //initialize new student
-	srand(time(0));
-	string line;
-	string keepf;
-	int randomf = rand() % 20;
-	ifstream myfile("fnames.txt");
-	int linenr;
-	while (getline(myfile,line)) {
-	  linenr++;
-	  if (linenr == randomf) {
-	    //cout << line << endl;
-	    strcpy(newStud->Fname, line.c_str());
-	    cout << newStud->Fname << endl;
-	  }
-	}
-	string lin;
-	string keepl;
-	int randoml = rand() % 20;
-	ifstream myfile1("lnames.txt");
-	linenr = 0; //restar count
-	while (getline(myfile1, lin)) {
-	  linenr++;
-	  if (linenr == randoml) {
-	    //cout << lin << endl;
-	    strcpy(newStud->Lname, lin.c_str());
-	    cout << newStud->Lname << endl;
-	  }
-	}
+	stud* newStud = new stud();  //initalize new student
+	//make random numbers between 0 and 19
+	int randomf = rand() % 19;
+	int randoml = rand() % 19;
+	//assign random data to new studen
+	strcpy(newStud->Fname, namef[randomf]);
+	strcpy(newStud->Lname, namel[randoml]);
+	cout << " " << newStud->Fname << " " << newStud->Lname << endl;
 	newStud->id = randid;
-	newStud->gpa = static_cast <float> (rand()) / (static_cast <float> (RAND_MAX/5));
+	newStud->gpa = (float)rand()/(RAND_MAX)*5;
 	randid = randid + 100;
 	//add new student genrated
 	ADD(list, newStud, size);
